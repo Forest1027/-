@@ -1,0 +1,120 @@
+String
+构造方法（3种）
+String(String original):把字符串数据封装成字符串对象
+String(char[] value):把字符数组的数据封装成字符串对象
+String(char[] value, int index, int count):把字符数组中的一部分数据封装成字符串对象
+代码：
+public class ConstructMethod {
+	public static void main(String[] args) {
+		//String(String original):把字符串数据封装成字符串对象
+		String s0 = new String("hello");
+		System.out.println(s0);
+		
+		//String(char[] value):把字符数组的数据封装成字符串对象
+		char[] chs = {'a','b','c','d'};
+		String s = new String(chs);
+		System.out.println(s);
+		
+		//String(char[] value, int index, int count):把字符数组中的一部分数据封装成字符串对象
+		String s1 = new String(chs,2,2);
+		System.out.println(s1);
+	}
+}
+判断功能（4种）
+boolean equals(Object obj):比较字符串的内容是否相同
+  boolean equalsIgnoreCase(String str):比较字符串的内容是否相同,忽略大小写
+  boolean startsWith(String str):判断字符串对象是否以指定的str开头
+  boolean endsWith(String str):判断字符串对象是否以指定的str结尾
+代码示例：
+public class Determination {
+	public static void main(String[] args) {
+		String s = "Hello";
+		String s1 = "hello";
+		String s2 = new String("Hello");
+		System.out.println("s equals? 1:"+s.equals(s1));
+		System.out.println("s equals? s2:"+s.equals(s2));
+		System.out.println("s==s2:"+(s==s2));
+//直接赋值，把常量池的对应字符串的地址值赋过来
+		//创建对象，在堆中创建新的对象，常量池中对应的字符串地址赋给堆中的相应位置，
+		//堆中对象的地址值再赋给栈中。“equals”比较的是字符串内容，“==”比较的是地址值
+		System.out.println("s equalsIgnoreCase s1:"+s.equalsIgnoreCase(s1));
+		System.out.println("s startsWith He:"+s.startsWith("He"));
+		System.out.println("s endWith lo:"+s.endsWith("lo"));
+	}
+}
+获取功能（5种）
+int length():获取字符串的长度，其实也就是字符个数
+  char charAt(int index):获取指定索引处的字符
+  int indexOf(String str):获取str在字符串对象中第一次出现的索引
+  String substring(int start):从start开始截取字符串
+  String substring(int start,int end):从start开始，到end结束截取字符串。包括start，不包括end
+代码示例：
+public class Getting {
+	public static void main(String[] args) {
+		String s = "Forest";
+		System.out.println("字符串长度："+s.length());
+		System.out.println("指定索引处的字符："+s.charAt(3));
+		System.out.println("r第一次出现时对应的索引："+s.indexOf("r"));
+		System.out.println("从索引1开始截取字符串："+s.substring(1));
+		System.out.println("从索引1开始截取字符串，到5截止："+s.substring(1, 5));//end填入索引5，结果不包含5.[0,5)
+	}
+}
+其他功能（2种）
+去除字符串两端空格	
+ *		String trim()
+ * 按照指定符号分割字符串	
+ *		String[] split(String str)
+代码示例：
+public class Others {
+	public static void main(String[] args) {
+		String s = "  Fore  st  ";
+		//去除字符串两端空格	String trim()
+		System.out.print(s.trim());
+		//按照指定符号分割字符串	String[] split(String str)
+		String[] stArr = s.split(" ");
+		for(int i= 0;i < stArr.length;i++) {
+			System.out.println(stArr[i]);
+		}
+		
+	}
+}
+
+StringBuilder
+构造方法
+     StringBuilder()
+成员方法
+     public int capacity():返回当前容量 (理论值)
+     public int length():返回长度(已经存储的字符个数)
+public StringBuilder append(任意类型):添加数据，并返回自身对象
+public StringBuilder reverse():反转功能
+String和StringBuilder的互相转换
+StringBuilder -- String
+			public String toString():通过toString()就可以实现把StringBuilder转成String
+			String 类的构造(StringBuilder sb);
+String -- StringBuilder
+			StringBuilder(String str):通过构造方法就可以实现把String转成StringBuilder
+			利用  StringBuilder 里的append(String str);
+	
+代碼示例
+public class StringBuilderString {
+	public static void main(String[] args) {
+		StringBuilder sb = new StringBuilder("hello");
+		//StringBuilder轉String
+		//StringBuilder的成員方法toString()
+		String s = sb.toString();
+		System.out.println(s);
+		
+		//String的構造方法
+		String s1 = new String(sb);
+		System.out.println(s1);
+		
+		//String轉StringBuilder
+		//StringBuilder的構造方法
+		StringBuilder sb1 = new StringBuilder(s);
+		System.out.println(sb1);
+		
+		//StringBuilder的成員方法append(String str);
+		sb.append(s);
+		System.out.println(sb);
+	}
+}
