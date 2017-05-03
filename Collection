@@ -1,0 +1,170 @@
+集合概述
+ 
+Collection常用功能
+boolean add(Object e): 向集合中添加元素
+void clear():清空集合中所有元素
+boolean contains(Object o):判断集合中是否包含某个元素
+boolean isEmpty():判断集合中的元素是否为空
+boolean remove(Object o):根据元素的内容来删除某个元素
+int size():获取集合的长度
+Object[] toArray():能够将集合转换成数组并把集合中的元素存储到数组中
+迭代器
+用于遍历
+Collection集合元素的通用获取方式：在取元素之前先要判断集合中有没有元素，如果有，就把这个元素取出来，继续在判断，如果还有就再取出出来。一直把集合中的所有元素全部取出。这种取出方式专业术语称为迭代。
+集合中把这种取元素的方式描述在Iterator接口中。
+获取迭代器对象
+Collection c = new ArrayList();
+Iterator it = c.iterator();
+Iterator接口的常用方法
+hasNext（）方法：判断集合中是否有元素可以迭代
+next（）方法：用来返回迭代的下一个元素，并把指针向后移动一位。
+并发修改异常
+当使用迭代器遍历集合的时候,使用了集合中的 增加/删除 方法,导致并发修改异常
+增强for
+增强for循环是JDK1.5以后出来的一个高级for循环，专门用来遍历数组和集合的。它的内部原理其实是个Iterator迭代器，所以在遍历的过程中，不能对集合中的元素进行增删操作。
+格式
+* 		for(元素的类型 变量 : 集合或者数组对象) {
+* 			可以直接使用变量;
+* 		}
+常见数据结构
+数组
+数组，采用该结构的集合，对元素的存取有如下的特点：
+查找元素快：通过索引，可以快速访问指定位置的元素
+增删元素慢 ,每次添加元素需要移动大量元素或这创建新的数组
+ 
+链表
+链表，采用该结构的集合，对元素的存取有如下的特点：
+A:多个节点之间，通过地址进行连接。例如，多个人手拉手，每个人使用自己的右手拉住下个人的左手，依次类推，这样多个人就连在一起了。
+B:查找元素慢：想查找某个元素，需要通过连接的节点，依次向后查找指定元素
+C:增删元素快：
+增加元素：只需要修改连接下个元素的地址即可。
+删除元素：只需要修改连接下个元素的地址即可
+ 
+栈&队列
+A:堆栈，采用该结构的集合，对元素的存取有如下的特点：
+先进后出（即，存进去的元素，要在后它后面的元素依次取出后，才能取出该元素）。例如，子弹压进弹夹，先压进去的子弹在下面，后压进去的子弹在上面，当开枪时，先弹出上面的子弹，然后才能弹出下面的子弹。
+B:队列，采用该结构的集合，对元素的存取有如下的特点：
+先进先出（即，存进去的元素，要在后它前面的元素依次取出后，才能取出该元素）。例如，安检。排成一列，每个人依次检查，只有前面的人全部检查完毕后，才能排到当前的人进行检查。
+
+  
+List子体系
+特点
+A:有序的（存储和读取的顺序是一致的） 
+B:有整数索引 
+C:允许重复的
+特有功能
+void add(int index, E element) :将元素添加到index索引位置上
+E get(int index) :根据index索引获取元素//因为list体系有整数索引，所以存在该方法，而collection的另一个子体系是没有的，因此，collection的方法不包含这种。collection中，任何与index有关的方法都不存在
+E remove(int index) :根据index索引删除元素
+E set(int index, E element):将index索引位置的的元素设置为element//以上返回类型为泛型，因为最后返回的内容为对应索引处的元素
+对比：
+Collection常用功能
+boolean add(Object e): 向集合中添加元素
+void clear():清空集合中所有元素
+boolean contains(Object o):判断集合中是否包含某个元素
+boolean isEmpty():判断集合中的元素是否为空
+boolean remove(Object o):根据元素的内容来删除某个元素
+int size():获取集合的长度
+Object[] toArray():能够将集合转换成数组并把集合中的元素存储到数组中
+LinkedList
+LinkedList底层使用的是链表结构,因此增删快,查询相对ArrayList较慢
+void addFirst(E e) :向链表的头部添加元素
+void addLast(E e):向链表的尾部添加元素
+E getFirst():获取链头的元素,不删除元素
+E getLast():获取链尾的元素,不删除元素
+E removeFirst():返回链头的元素并删除链头的元素
+E removeLast():返回链尾的元素并删除链尾的元素
+闪闪发光的练习题们
+1.
+电脑类想要同时使用键盘类和鼠标类的功能，不使用继承。由于键盘类和鼠标类同实现了一个接口，因此可以将接口对象（多态）作为形式参数传进电脑类的方法中，在方法中调用各自的功能
+package laborday;
+//【第4题】	
+//分析以下需求，并用代码实现
+//	进行描述笔记本类，实现笔记本使用USB鼠标、USB键盘
+//	1.定义USB接口:
+//		开启功能
+//		关闭功能
+interface USB {
+	void open();
+	void close();
+}
+//	2.定义笔记本类:
+//		开机功能
+//		关机功能
+//		定义使用USB设备的功能
+//		要求:既能使用鼠标也能使用键盘,使用USB功能内部调用开启和关闭功能
+class Laptop {
+
+	public Laptop() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public void openLap() {
+		System.out.println("开机");
+	}
+	public void openUSB(USB u) {	//将对象作为形式参数传递进来，在对象一中使用与自身毫不相关的对象二的功能
+		u.open();
+		
+	}
+	public void closeUSB(USB u) {
+		u.close();
+	}
+	public void closeLap() {
+		System.out.println("关机");
+	}
+}
+//	3.定义鼠标类:
+//		要符合USB接口
+class Mouse implements USB {
+
+	@Override
+	public void open() {
+		// TODO Auto-generated method stub
+		System.out.println("连接鼠标的USB");
+	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		System.out.println("断开鼠标的USB");
+	}
+	
+}
+//	4.定义键盘类:
+//		要符合USB接口
+class Keyboard implements USB{
+
+	@Override
+	public void open() {
+		// TODO Auto-generated method stub
+		System.out.println("连接键盘的USB");
+	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		System.out.println("断开键盘的USB");
+	}
+	
+}
+//	5.定义测试类:
+//		创建电脑对象,依次调用开机方法,使用USB设备, 关机方法
+//
+//		打印效果如下:
+//			开机
+//			连接鼠标的USB
+//			断开鼠标的USB
+//			连接键盘的USB
+//			断开键盘的USB
+//			关机
+public class Test4 {
+	public static void main(String[] args) {
+		Laptop lt = new Laptop();
+		lt.openLap();
+		lt.openUSB(new Mouse());
+		lt.closeUSB(new Mouse());
+		lt.openUSB(new Keyboard());
+		lt.closeUSB(new Keyboard());
+		lt.closeLap();
+	}
+}
