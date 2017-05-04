@@ -1,0 +1,362 @@
+Set接口特点
+Set体系的集合:
+    A:存入集合的顺序和取出集合的顺序不一致
+    B:没有索引
+    C:存入集合的元素没有重复
+HashSet使用&唯一性原理
+HashSet的使用
+HashSet唯一性原理
+   
+规则:新添加到HashSet集合的元素都会与集合中已有的元素一一比较
+首先比较哈希值(每个元素都会调用hashCode()产生一个哈希值)
+如果新添加的元素与集合中已有的元素的哈希值都不同,新添加的元素存入集合
+如果新添加的元素与集合中已有的某个元素哈希值相同,此时还需要调用equals(Object obj)比较
+如果equals(Object obj)方法返回true,说明新添加的元素与集合中已有的某个元素的属性值相同,那么新添加的元素不存入集合
+如果equals(Object obj)方法返回false, 说明新添加的元素与集合中已有的元素的属性值都不同, 那么新添加的元素存入集合
+代码：
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+public class SetDemo {
+	public static void main(String[] args) {
+		Student s1 = new Student("a",18);
+		Student s2 = new Student("b",19);
+		Student s3 = new Student("c",17);
+		Set<Student> set = new HashSet<>();
+		set.add(s1);
+		set.add(s2);
+		set.add(s3);
+		//轉數組
+		Student[] arr = set.toArray(new Student[set.size()]);
+		for (int i = 0; i < arr.length; i++) {
+			System.out.println(arr[i]);
+		}
+		System.out.println("---------");
+		//iterator
+		Iterator it = set.iterator();
+		while(it.hasNext()) {
+			System.out.println(it.next());
+		}
+		System.out.println("---------");
+		//foreach
+		for (Student student : set) {
+			System.out.println(student);
+		}
+		//System.out.println("---------");
+	}
+}
+class Student {
+	private String name;
+	private int age;
+	public Student() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Student(String name, int age) {
+		super();
+		this.name = name;
+		this.age = age;
+	}
+	@Override
+	public String toString() {
+		return "Student [name=" + name + ", age=" + age + "]";
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + age;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Student other = (Student) obj;
+		if (age != other.age)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+}
+Collections中的方法
+代码
+package com.itheima_03;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/*
+ * Collections：
+ * 面试题：Collection和Collections有什么区别？
+ * 		Collection是集合体系的最顶层，包含了集合体系的共性
+ * 		Collections是一个工具类，方法都是用于操作Collection
+ * 
+ */
+public class CollectionsDemo {
+	public static void main(String[] args) {
+		//static void swap(List list, int i, int j) :将指定列表中的两个索引进行位置互换
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1);
+		list.add(4);
+		Collections.swap(list, 0, 1);
+		
+		System.out.println(list);
+	
+	}
+
+	private static void method6() {
+		//static void  sort(List<T> list) :按照列表中元素的自然顺序进行排序
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1);
+		list.add(4);
+		list.add(3);
+		list.add(2);
+		
+		Collections.sort(list);
+		System.out.println(list);
+	}
+
+	private static void method5() {
+		//static void shuffle(List list):傻否，随机置换  
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1);
+		list.add(2);
+		list.add(3);
+		list.add(4);
+		Collections.shuffle(list);
+		System.out.println(list);
+	}
+
+	private static void method4() {
+		//static void reverse(List list)  :反转
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1);
+		list.add(2);
+		list.add(3);
+		list.add(4);
+		
+		Collections.reverse(list);
+		System.out.println(list);
+	}
+
+	private static void method3() {
+		//static void fill(List list, Object obj) :使用指定的对象填充指定列表的所有元素
+		List<String> list = new ArrayList<String>();
+		list.add("hello");
+		list.add("world");
+		list.add("java");
+		System.out.println(list);
+		
+		Collections.fill(list, "android");
+		
+		System.out.println(list);
+	}
+
+	private static void method2() {
+		//static void copy(List dest, List src) :是把源列表中的数据覆盖到目标列表
+		//注意：目标列表的长度至少等于源列表的长度
+		//创建源列表
+		List<String> src = new ArrayList<String>();
+		src.add("hello");
+		src.add("world");
+		src.add("java");
+		
+		//创建目标列表
+		List<String> dest = new ArrayList<String>();
+		dest.add("java");
+		dest.add("java");
+		dest.add("java");
+		dest.add("java");
+		Collections.copy(dest, src);
+		System.out.println(dest);
+	}
+
+	private static void method() {
+		//static int  binarySearch(List list, Object key) 使用二分查找法查找指定元素在指定列表的索引位置 
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1);
+		list.add(2);
+		list.add(3);
+		list.add(4);
+		
+		int index = Collections.binarySearch(list, 4);
+		System.out.println(index);
+	}
+}
+
+鬥地主發牌
+package day7;
+//具体规则：
+//1. 组装54张扑克牌
+//2. 将54张牌顺序打乱
+//3. 三个玩家参与游戏，三人交替摸牌，每人17张牌，最后三张留作底牌。
+//4. 查看三人各自手中的牌、底牌
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class PlayCards {
+	public static void main(String[] args) {
+		String[] color = {"黑桃","红心","方块","梅花"};
+		String[] num = {"A","2","3","4","5","6","7","8","9","10","J","Q","K"};
+		List<String> box = new ArrayList<>();
+		for (int i = 0; i < color.length; i++) {
+			for (int j = 0; j < num.length; j++) {
+				box.add(color[i]+num[j]);
+			}
+		}
+		box.add("大王");
+		box.add("小王");
+		//System.out.println(box.size());
+		Collections.shuffle(box);
+		List<String> a = new ArrayList<>();
+		List<String> b = new ArrayList<>();
+		List<String> c = new ArrayList<>();
+		for (int i = 0; i < box.size()-3; i++) {
+			if(i%3==0) {
+				a.add(box.get(i));
+			}else if(i%3==1) {
+				b.add(box.get(i));
+			}else if(i%3==2) {
+				c.add(box.get(i));
+			}
+		}
+		System.out.println("a="+a);
+		System.out.println("b="+b);
+		System.out.println("c="+c);
+		System.out.println("底牌");
+		for (int i = box.size()-3; i < box.size(); i++) {
+			System.out.println(box.get(i));
+		}
+	}
+}
+Map接口概述
+我们通过查看Map接口描述，发现Map接口下的集合与Collection接口下的集合，它们存储数据的形式不同，如下图。
+A:Collection中的集合，元素是孤立存在的（理解为单身），向集合中存储元素采用一个个元素的方式存储
+B:Map中的集合，元素是成对存在的(理解为夫妻)。每个元素由键与值两部分组成，通过键可以找对所对应的值。
+C:Collection中的集合称为单列集合，Map中的集合称为双列集合。
+需要注意的是，Map中的集合不能包含重复的键，值可以重复；每个键只能对应一个值。
+
+Map常用功能
+A:映射功能：
+   V put(K key, V value) :以键=值的方式存入Map集合
+B:获取功能：
+     V get(Object key):根据键获取值
+int size():返回Map中键值对的个数
+C:判断功能：
+    boolean containsKey(Object key):判断Map集合中是否包含键为key的键值对
+    boolean containsValue(Object value):判断Map集合中是否包含值为value键值对
+ boolean isEmpty():判断Map集合中是否没有任何键值对 
+D:删除功能：
+  void clear():清空Map集合中所有的键值对
+  V remove(Object key):根据键值删除Map中键值对
+E:遍历功能：
+  Set<Map.Entry<K,V>> entrySet():将每个键值对封装到一个个Entry对象中,再把所有Entry的对象封装到Set集合中返回
+  Set<K> keySet() :将Map中所有的键装到Set集合中返回
+  Collection<V> values():返回集合中所有的value的值的集合
+代碼
+package day7;
+//测试以下方法:
+//	 V put(K key, V value)
+//	 V get(Object key)
+//	 int size()
+//	boolean containsKey(Object key)
+//	boolean containsValue(Object value)
+//	boolean isEmpty()
+//	void clear()
+//	V remove(Object key)
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MapDemo {
+	public static void main(String[] args) {
+		Map<String,String> map = new HashMap<>();
+//		 V put(K key, V value)
+		map.put("a", "99");
+		map.put("b", "78");
+		map.put("c", "90");
+		System.out.println(map);
+//		V get(Object key)
+		System.out.println(map.get("a"));
+//		int size()
+		System.out.println(map.size());
+//		boolean containsKey(Object key)
+		System.out.println(map.containsKey("c"));
+//		boolean containsValue(Object value)
+		System.out.println(map.containsValue("90"));
+//		boolean isEmpty()
+		System.out.println(map.isEmpty());
+//		void clear()
+		
+//		V remove(Object key)
+		System.out.println(map.remove("a"));
+		System.out.println(map);
+		
+	}
+}
+Map的两种遍历方式
+利用keySet()方法遍历
+利用entrySet()方法遍历
+package day7;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+//定义一个学生类,学生类中有name和age两个属性
+//创建三个学生对象,分别对name和age赋值
+//然后以key为学生对象,value为学生的学号的方式
+//存入HashMap集合,利用两种方式遍历这个Map
+public class HashMapPrint {
+	public static void main(String[] args) {
+		Map<Student,String> map = new HashMap<>();
+		Student s1 = new Student("a",18);
+		Student s2 = new Student("b",19);
+		Student s3 = new Student("b",19);
+		map.put(s1, "001");
+		map.put(s2, "002");
+		map.put(s3, "003");
+		//System.out.println(map);
+		//1.利用keySet()方法遍历
+//召集所有丈夫，讓丈夫去找妻子
+		Set<Student> keys = map.keySet();
+		for (Student key : keys) {
+			System.out.println(key+"--------"+map.get(key));
+		}
+		System.out.println("------");
+		//2.利用entrySet()方法遍历
+//獲取所有結婚證對象，每個結婚證對象裏面包含丈夫和妻子
+		Set<Map.Entry<Student,String>> entrys = map.entrySet();
+		for (Entry<Student, String> entry : entrys) {
+			System.out.println(entry.getKey()+"--------"+entry.getValue());
+		}
+	}
+}
+
