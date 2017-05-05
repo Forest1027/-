@@ -1,0 +1,245 @@
+异常产生&异常处理
+异常概述
+什么是异常
+		不正常，程序在编译或者运行时出现的错误
+	
+异常体系
+		Throwable
+			|-Error：严重的错误，程序无法处理的，比如服务器宕机，数据库崩溃，内存溢出
+			|-Exception：非严重的错误，可以处理的
+				|—编译时异常：Exception下所有的除了RuntimeException及其子类之外的所有的异常
+				|—运行时异常：Exception下包含RuntimeException及其子类
+异常处理
+JVM默认如何处理异常？
+	1、将异常信息打印在控制台
+	2、终止程序的运行
+处理异常方式
+	方式一：捕获处理（try...catch...）
+		三种组合：
+			try...catch...
+			try...catch...finally...
+			try...finally...
+	
+			格式一：
+			try{
+			
+			}catch(异常类型 变量名){
+			
+			}
+		注：catch块可以没有，也可以有多个
+		
+		try:	存放可能出现异常的代码
+		catch:	捕获并处理异常
+		finally：表示最终，一定会执行的语句块，常常由于释放资源
+处理多个异常
+	1、使用多个try...catch...语句，每一个分别处理一个异常
+	2、使用一个try多个catch
+	 注意：
+	 	（1）try中如果有多个异常，只会执行第一个，第一个报了异常之后try后面的语句不执行
+	 	（2）多个catch块最多只会执行一个，从上往下判断是否能被catch块捕获
+	 	（3）多个catch块中，大的异常放后面，小的放前面
+	 	
+	 JDK1.7处理多个异常的新特性：|
+	 	注意：多个异常之间不能有子父类关系，只能是平级的
+		
+		try {
+			String s = null;
+			System.out.println(s.length());
+			
+			int[] arr = new int[5];
+			System.out.println(arr[8]);
+			
+			System.out.println(2 / 0);
+		} catch(ArrayIndexOutOfBoundsException | NullPointerException e) {
+			System.out.println("出现异常了");
+		}
+		
+	方式二：抛出（throws）
+		throws用于抛出异常类名，使用在方法声明上
+		throws可以抛出多个异常，多个之间用逗号分隔
+		
+		修饰符 返回值类型 方法名(参数列表) throws 异常类名{
+		
+		}
+运行时异常和编译时异常
+网络大神的解释（链接）
+
+A:编译时期异常:是Exception的子类，非RuntimeExcpetion的子类，在编译时期必须处理。如FileWriter/FileReader/BufferedWriter/BufferedReader的异常均属于编译时异常。
+B:RuntimeException和他的所有子类异常,都属于运行时期异常。NullPointerException, ArrayIndexOutOfBoundsException等都属于运行时期异常.
+运行时期异常的特点:
+方法中抛出运行时期异常,方法定义中无需throws声明,调用者也无需处理此异常
+运行时期异常一旦发生,需要程序人员修改源代码.
+代码：
+package day8;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class ExceptionDemo3 {
+	public static void main(String[] args) {
+		FileWriter fw = null;
+		try {
+			
+			fw = new FileWriter("a.txt");
+			fw.write("hi");
+			fw.write(" ");
+			fw.write("beau");
+			System.out.println("hi");
+			//System.out.println(2/0);
+		}catch(ArithmeticException e) {
+			System.out.println(e.getMessage());
+		}catch(IOException e) {		//结果不会输出此catch块内的内容。因为FileWriter属于编译时异常，编译时就需要处理异常，否则无法进行编译。因此在运行时，已经无异常了。
+			System.out.println(e.getMessage());
+			e.toString();
+			e.printStackTrace();
+		}finally {
+			try {
+				if(fw != null) {	//需要判断fw是否为空，因为fw如果为空，fw.close()执行是会报空指针异常。
+					fw.close();
+				}
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		}
+	}
+}
+Throwable常用方法及自定义异常类
+Throwable常用方法
+		String getMessage()  :打印异常出现的原因
+		String toString()  	 ：异常类名+异常出现的原因
+		void printStackTrace()  ：异常类名+异常出现的原因+异常出现的位置，该方法是JVM打印异常信息的默认的方式
+		
+finally
+	表示一定会执行的语句，不管异常发生还是不发生，即使在try或者catch块中有return语句，finally照样执行
+	只有当有退出JVM的语句时（System.exit(0)）才不会执行
+	
+	面试题：
+		final、finally和finalize的区别？
+		final用于修饰类、变量和成员方法，修饰类表示该类不能被继承；修饰变量变成了常量，不能再次赋值；修饰成员方法，该方法不能被重写
+		finally它是try...catch...finally...异常处理语句块的一个分支，表示一定会执行的语句，常常用于释放资源
+		finalize它是Object类中的一个方法，被垃圾回收期来调用
+throw和throws的区别
+	throws它是异常处理的方式之一，在方法声明上面使用，抛出的是异常类名，可以抛出多个，多个之间用逗号隔开
+	throw它是制造异常的方式，在方法内部使用，抛出的是异常对象，一个throw只能抛出一个异常对象
+	
+自定义异常
+	什么要自定义异常？
+		做到见名知义
+	如何自定义异常？
+		自定义一个类继承Exception或者RuntimeException，然后只要根据父类生成几个构造方法即可
+	自定义异常的使用？
+		使用时和Java提供的异常一样使用，自定义的编译时异常在编译时期必须处理，自定义的运行时异常在编译时可以处理也可以不处理
+	
+代码：定义一个方法
+定义一个方法，在不满足条件的时候，抛出运行时异常或编译时异常，来阻止程序继续运行。
+package day8;
+//需求：写一个方法，接受考试成绩，如果考试成绩的范围在0-100之间则属于正常，否则属于异常
+//当成绩不在0~100范围内,抛出一个运行时异常或者编译时异常,阻止程序继续向下执行
+public class DIYException {
+	public static void main(String[] args) {
+		try {
+			int score = -10;
+			method(score);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("hi");
+	}
+	public static void method(int score) {
+		if(!(score<=100&&score>=0)) {
+			throw new RuntimeException("成绩有误");
+		}
+		System.out.println("成绩正确");
+	}
+}
+/*
+java.lang.RuntimeException: 成绩有误
+	at day8.DIYException.method(DIYException.java:17)
+	at day8.DIYException.main(DIYException.java:8)
+hi
+*/
+代码：定义一个异常类
+定义一个异常类，继承Exception。再写方法，在不满足条件时抛出这个异常
+package day8;
+//需求：写一个方法，接受考试成绩，如果考试成绩的范围在0-100之间则属于正常，否则属于异常
+//当成绩不在0~100范围内,抛出一个运行时异常或者编译时异常,阻止程序继续向下执行
+public class DIYException {
+	public static void main(String[] args) {
+		try {
+			int score = -10;
+			method(score);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("hi");
+	}
+	public static void method(int score) {
+		if(!(score<=100&&score>=0)) {
+			throw new RuntimeException("成绩有误");
+		}
+		System.out.println("成绩正确");
+	}
+	public static void method1(int score) throws Exception {
+		if(!(score<=100&&score>=0)) {
+			throw new MyException("成绩有误");
+		}
+		System.out.println("成绩正确");
+	}
+}
+class MyException extends Exception{
+
+	public MyException() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+
+	public MyException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
+
+	
+	
+}
+
+递归
+概念
+	方法自身调用自身
+注意：递归要有出口
+代码：
+阶乘
+package day8;
+//阶乘n!
+public class RecurrenceDemo {
+	public static void main(String[] args) {
+		System.out.println(jC(5));
+	}
+	public static int jC(int num) {
+		if(num == 1) {
+			return 1;
+		}
+		return num*jC((num-1));
+	}
+}
+不死神兔/斐波纳挈数列
+/*有一对兔子，从出生后第3个月起每个月都生一对兔子，
+小兔子长到第三个月后每个月又生一对兔子，假如兔子都不死，
+问第二十个月的兔子对数为多少？*/
+
+package day8;
+
+public class UndyingRabbitDemo {
+	public static void main(String[] args) {
+		System.out.println(method(5));
+	}
+	public static int method(int mon) {
+		if(mon == 1 || mon == 2) {
+			return 1;
+		}
+		return method(mon-1) + method(mon-2);
+	}
+}
