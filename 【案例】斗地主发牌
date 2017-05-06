@@ -1,0 +1,47 @@
+鬥地主發牌
+package day7;
+//具体规则：
+//1. 组装54张扑克牌
+//2. 将54张牌顺序打乱
+//3. 三个玩家参与游戏，三人交替摸牌，每人17张牌，最后三张留作底牌。
+//4. 查看三人各自手中的牌、底牌
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class PlayCards {
+	public static void main(String[] args) {
+		String[] color = {"黑桃","红心","方块","梅花"};
+		String[] num = {"A","2","3","4","5","6","7","8","9","10","J","Q","K"};
+		List<String> box = new ArrayList<>();
+		for (int i = 0; i < color.length; i++) {
+			for (int j = 0; j < num.length; j++) {
+				box.add(color[i]+num[j]);
+			}
+		}
+		box.add("大王");
+		box.add("小王");
+		//System.out.println(box.size());
+		Collections.shuffle(box);
+		List<String> a = new ArrayList<>();
+		List<String> b = new ArrayList<>();
+		List<String> c = new ArrayList<>();
+		for (int i = 0; i < box.size()-3; i++) {
+			if(i%3==0) {
+				a.add(box.get(i));
+			}else if(i%3==1) {
+				b.add(box.get(i));
+			}else if(i%3==2) {
+				c.add(box.get(i));
+			}
+		}
+		System.out.println("a="+a);
+		System.out.println("b="+b);
+		System.out.println("c="+c);
+		System.out.println("底牌");
+		for (int i = box.size()-3; i < box.size(); i++) {
+			System.out.println(box.get(i));
+		}
+	}
+}
