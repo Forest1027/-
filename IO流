@@ -1,0 +1,282 @@
+File类
+用于封装文件和文件夹
+构造函数
+（构造函数里面放入路径，只是为了关联这个路径，以便后续处理。关联的路径指向的文件或者文件夹可以存在也可以不存在）
+File(String pathname) :将一个字符串路径封装成File对象
+File(String parent, String child):传入一个父级路径和子级路径
+File(File parent, String child):传入一个File类型的父级路径和子级路径
+绝对路径和相对路径
+		绝对路径：以盘符开头，比如E:\JavaEE基础3.0\陈文\day09
+		相对路径：不以盘符开头，Eclipse下相对路径相对的是当前项目路径下
+创建及删除功能
+boolean createNewFile():创建文件，不能创建文件夹，如果文件不存在创建成功，如果存在不创建
+boolean mkdir():当指定的单级文件夹不存在时创建文件夹并返回true，否则返回false。创建单级文件夹，不能创建文件 
+boolean mkdirs():当指定的多级文件夹某一级文件夹不存在时,创建多级文件夹并返回true,否则返回false，创建单级和多级文件夹，不能创建文件
+boolean delete():删除文件或者删除单级文件夹，删除不走回收站
+package day9;
+
+import java.io.File;
+import java.io.IOException;
+
+//独立测试File类的创建和删除功能
+//boolean createNewFile() 
+//boolean mkdir() 
+//boolean mkdirs() 
+//boolean delete()
+//用Java程序在Eclipse的当前项目路径下创建的一个hello/world/a.txt文件
+
+public class FileAddDeleteDemo {
+	public static void main(String[] args) throws IOException {
+		File f1 = new File("a1.txt");
+		f1.createNewFile();
+		File f2 = new File("c\\d\\s");
+		System.out.println(f2.mkdirs());
+		f1.delete();
+		File f3 = new File(new File("hello\\world"),"a.txt");
+		f3.getParentFile().mkdirs();
+		f3.createNewFile();
+		/*// 错误的方式：
+		File file = new File("hello/world/a.txt");
+		System.out.println(file.createNewFile());*/
+		
+		// 正确的方式：
+		File file2 = new File("hello//world");
+		file2.mkdirs();
+//		File file = new File("hello/world/a.txt");
+		File file = new File(file2,"a.txt");// hello//world//a.txt
+		System.out.println(file.createNewFile());
+	}
+}
+File类的判断功能
+boolean exists():判断指定路径的文件或文件夹是否存在
+boolean isA bsolute():判断当前路路径是否是绝对路径
+boolean isDirectory():判断当前的目录是否存在 
+注意即使路径关联的是文件夹，但该文件夹如果不存在也会返回false
+boolean isFile():判断当前路径是否是一个文件
+boolean isHidden():判断当前路径是否是隐藏文件
+File类的获取功能和修改名字功能
+  File getAbsoluteFile():获取文件的绝对路径,返回File对象
+  String getAbsolutePath():获取文件的绝对路径,返回路径的字符串
+  String getParent():获取当前路径的父级路径,以字符串形式返回该父级路径
+  File getParentFile():获取当前路径的父级路径,以字File对象形式返回该父级路径
+  String getName():获取文件或文件夹的名称
+  String getPath():获取File对象中封装的路径
+  long lastModified():以毫秒值返回最后修改时间
+  long length():返回文件的字节数
+  boolean renameTo(File dest): 将当前File对象所指向的路径 修改为 指定File所指向的路径
+String[] list():以字符串数组的形式返回当前路径下所有的文件和文件夹的名称
+File[] listFiles():以File对象的形式返回当前路径下所有的文件和文件夹的名称
+static File[] listRoots():获取计算机中所有的盘符
+案例
+1.輸出所有文件名
+package day9;
+//使用递归来完成输出指定目录下所有的java文件名(包含子目录)
+
+import java.io.File;
+
+public class RecurrenceDemo {
+	public static void main(String[] args) {
+		File file = new File("C:/");
+		method(file);
+	}
+	public static void method(File file) {
+		if(file.isDirectory()) {
+			File[] list = file.listFiles();
+			for (File file2 : list) {
+				if(file2.isFile()) {
+					if(file2.getName().endsWith(".java")) {
+						System.out.println(file2.getName());
+					}
+				}else if(file2.isDirectory()) {
+					method(file2);
+				}
+			}
+		}
+	}
+}
+
+2.刪除
+package day9;
+
+import java.io.File;
+
+//能够独立完成递归和delete()方法删除目录以及子目录
+public class DeleteDemo {
+	public static void main(String[] args) {
+		File file = new File("C:\\Users\\Forest\\Documents\\JAVA文档\\test");
+		delete(file);
+	}
+	public static void delete(File file) {
+		if(file.isDirectory()) {
+			File[] list = file.listFiles();
+			for (File file2 : list) {
+				if(file2.isFile()) {
+					System.out.println(file.getName());
+					file2.delete();
+				}else if(file2.isDirectory()) {
+					delete(file2);
+				}
+			}
+		}
+		System.out.println(file.getName());
+		file.delete();
+	}
+}
+
+3.求文件内存和
+package day9;
+
+import java.io.File;
+import java.util.Scanner;
+
+public class SumDemo {	
+	public static void main(String[] args) {
+		// 从键盘接收一个文件夹路径
+		/*// （1）创建键盘录入对象
+		Scanner sc = new Scanner(System.in);
+		// 温馨提示
+		System.out.println("请输入一个文件夹路径：");
+		// （2）获取输入的文件夹路径
+		String path = sc.nextLine();
+		// （3）将String类型的路径封装成File对象
+		File dir = new File(path);*/
+		File dir = getDir();
+		
+		// 统计该文件夹大小
+		long length = sumLen(dir);
+		System.out.println("文件夹的大小为："+length);// 23,997,865
+	}
+
+	public static File getDir() {
+		// （1）创建键盘录入对象
+		Scanner sc = new Scanner(System.in);
+		// 温馨提示
+		System.out.println("请输入一个文件夹路径：");
+		while (true) {
+			// （2）获取输入的文件夹路径
+			String path = sc.nextLine();
+			// （3）将String类型的路径封装成File对象
+			File dir = new File(path);
+			if (!dir.exists()) {
+				System.out.println("您输入的路径不存在，请重新输入：");
+			}else if (dir.isFile()) {
+				System.out.println("您输入的是文件路径，请重新输入：");
+			} else {
+				return dir;
+			}
+		}
+	}
+
+	/**
+	 * 获取文件夹的大小
+	 * @param dir
+	 * @return
+	 */
+//	private static long sum = 0;
+	public static long sumLen(File dir) {
+		long sum = 0;								// 求和变量
+		// （4）通过listFiles()方法获取文件夹下的所有文件和文件夹的File类型数组
+		File[] files = dir.listFiles();
+		// （5）遍历数组，得到每一个文件或者文件夹
+		for (File file : files) {
+			// （6）如果是文件，获取大小
+			if (file.isFile()) {
+				sum += file.length();
+			// （7）如果是文件夹，递归获取大小
+			}else /*if(file.isDirectory())*/{
+				sum += sumLen(file);
+//				sumLen(file);
+			}
+		}
+		return sum;
+	}
+}
+字符流与字节流
+IO流的分类
+	流向
+		输入流		读取
+		输出流		写出
+	操作数据的类型
+		字节流
+		字符流
+IO流的体系
+ 	字符流（Reader和Writer）
+ 		FileReader和FileWriter
+ 		BufferedReader和BufferedWriter
+ 	字节流（InputStream和OutputStream）
+ 		FileInputStream和FileOutputStream
+ 		BufferedInputStream和BufferedOutputStream
+字符流拷贝用记事本打开后可读的文件
+字节流可以拷贝任意文件，包括视频、图片等
+字符流的拷贝
+ 	方式一：一个个字符读写
+	 	FileReader fr = new FileReader("day09课堂笔记.txt"); // 创建字符输入流，关联要读取文件
+	 	FileWriter fw = new FileWriter("a.txt");		// 字符输出流，关联要写入的文件
+	 	
+	 	int c;
+	 	while((c=fr.read())!=-1){
+	 		fw.write(c);
+	 	}
+	 	
+	 	fr.close();
+	 	fw.close();
+ 	方式二：定义标准的数组
+ 		FileReader fr = new FileReader("day09课堂笔记.txt");// 创建字符输入流，关联要读取文件
+	 	FileWriter fw = new FileWriter("a.txt");		// 字符输出流，关联要写入的文件
+	 	
+	 	char[] chs = new char[1024*8];
+	 	int len;
+	 	while((len=fr.read(chs))!=-1){
+	 		fw.write(chs,0,len);
+	 	}
+ 	
+ 		fr.close();
+ 		fw.close();
+ 		
+ 	方式三：使用缓冲流一个个读写
+ 		BufferedReader br = new BufferedReader(new FileReader("day09课堂笔记.txt"));
+ 		BufferedWriter bw = new BufferedWriter(new FileWriter("a.txt"));
+ 		
+ 		int c;
+ 		while((c=br.read())!=-1){
+ 			bw.write(c);
+ 		}
+ 		
+ 		br.close();
+ 		bw.close();
+ 		
+ 	方式四：使用缓冲流一行行读写
+ 		BufferedReader br = new BufferedReader(new FileReader("day09课堂笔记.txt"));
+ 		BufferedWriter bw = new BufferedWriter(new FileWriter("a.txt"));
+ 		
+ 		String line;
+ 		while((line=br.readLine())!=null){
+ 			bw.write(line);
+ 			bw.newLine();
+ 		}
+ 		
+ 		br.close();
+ 		bw.close();
+字节流拷贝
+package day9;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+//字节流进行图片的复制
+public class StramCopyDemo {
+	public static void main(String[] args) throws IOException {
+		FileInputStream fis = new FileInputStream("C:\\Users\\Forest\\Pictures\\loving pictures\\Damon.jpg");
+		FileOutputStream fos = new FileOutputStream("Damon.jpg");
+		int len = 0;
+		byte[] b = new byte[1024];
+		while ((len = fis.read(b)) != -1) {
+			fos.write(b,0,len);
+		}
+		
+		fos.close();
+		fis.close();
+	}
+}
+
