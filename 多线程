@@ -1,0 +1,401 @@
+多线程的概述
+	进程：当前正在运行的程序，占用内存和CPU的资源，包含线程，可以有多条线程，至少有一条
+			进程负责分配内存空间，不进行执行，负责执行的是线程
+	线程（执行路径，执行情景，控制单元）：程序的一条执行单元（路径），依赖于进程
+	多线程：程序的多条执行路径（一个进程中可以有多个执行路径）。目的是运行多部分代码。
+	应用程序的执行都是cpu做快速切换完成的，切换是随机的，这种随机切换依赖于“时间片”。
+虚拟机的启动本身依赖多条线程，至少有两个线程。举例：当堆里的“垃圾”越来越多，垃圾回收线程会和主线程快速切换，去回收垃圾。
+	多线程的好处：
+	解决了需要多个程序同时运行的问题
+	多线程的弊端：
+	使效率变低
+	多线程的特点：
+		随机性（CPU在多条线程之间来回的高速切换）
+主线程只有在其他线程执行完毕后才会关闭。即使主线程出现了异常。
+如代码：
+package day20170510;
+
+public class ThreadDemo {
+	public static void main(String[] args) {
+		MyThread mt1 = new MyThread("a");
+		MyThread mt2 = new MyThread("b");
+		mt1.start();
+		mt2.start();
+		System.out.println(4/0);//ArithmeticException,从结果可以看出，主方法报了异常，而mt1、mt2还是执行完了。
+		System.out.println("over..."+Thread.currentThread());
+	}
+}
+class MyThread extends Thread {
+	private String name;
+	
+	public MyThread() {
+		super();
+		// TODO Auto-generated constructor stub
+		
+	}
+
+	public MyThread(String name) {
+		super(name);
+		// TODO Auto-generated constructor stub
+		this.name = name;
+	}
+
+	public void run() {
+		for (int i = 0; i < 20; i++) {
+			System.out.println(name+":"+i+"..."+Thread.currentThread().getName());
+		}
+		
+	}
+}
+结果之一为：
+Exception in thread "main" a:0...a
+a:1...a
+a:2...a
+a:3...a
+a:4...a
+a:5...a
+a:6...a
+a:7...a
+a:8...a
+a:9...a
+a:10...a
+a:11...a
+a:12...a
+a:13...a
+a:14...a
+a:15...a
+a:16...a
+a:17...a
+a:18...a
+a:19...a
+java.lang.ArithmeticException: / by zerob:0...b
+b:1...b
+b:2...b
+
+b:3...b
+b:4...b
+b:5...b
+b:6...b
+b:7...b
+b:8...b
+b:9...b
+b:10...b
+b:11...b
+b:12...b
+b:13...b
+b:14...b
+b:15...b
+b:16...b
+b:17...b
+b:18...b
+b:19...b
+	at day20170510.ThreadDemo.main(ThreadDemo.java:9)
+
+
+实现多线程的方式（2种方式）
+	方式一：继承Thread类
+		步骤：
+			（1）自定义一个类，继承Thread类
+			（2）在自定义类中，重写run()方法，这个是线程执行的主体
+			（3）在测试类中，创建自定义类的对象
+			（4）调用start()方法启动线程
+			
+		// （1）自定义一个类，继承Thread类
+		class MyThread extends Thread{
+			// （2）在自定义类中，重写run()方法;
+			public void run() {
+				// 线程执行的核心代码
+			}
+		}
+		public class Test{
+			public static void main(String[] args){
+				// （3）在测试类中，创建自定义类的对象
+				MyThread mt = new MyThread();
+				// （4）调用start()方法启动线程
+				mt.start();
+			}
+		}
+	
+	
+	方式二：实现Runnable接口
+		
+		步骤：
+			（1）自定义一个类，实现Runnable接口
+			（2）在自定义类中重写run()方法
+			（3）在测试类中，创建自定义类的对象
+			（4）创建Thread类的对象，将自定义类的对象当做参数传递进来
+			（5）使用Thread类的对象调用start()方法启动线程
+	
+		// （1）自定义一个类，实现Runnable接口
+		class MyThread2 implements Runnable{
+			// （2）在自定义类中重写run()方法
+			public void run(){
+				// 线程执行的核心代码
+			}
+		}
+		public class Test{
+			public static void main(String[] args){
+				// （3）在测试类中，创建自定义类的对象
+				MyThread2 mt = new MyThread2();
+				// （4）创建Thread类的对象，将自定义类的对象当做参数传递进来
+				Thread th = new Thread(mt);
+				// （5）使用Thread类的对象调用start()方法启动线程
+				th.start();
+			}
+		}
+		
+面试题1
+启动线程是调用start()方法还是run()方法，以及它们的区别
+	启动线程调用的是start()方法。
+	区别：调用start()方法可以启动一条新的线程，并且start()的底层自动调用run()方法
+		调用run()方法不能启动新线程，相当于调用一个对象中的普通方法
+辨析：
+public class ThreadDemo {
+	public static void main(String[] args) {
+		MyThread mt = new MyThread();
+		mt.setName("a");
+		mt.start();
+		MyThread mt1 = new MyThread();
+		mt1.setName("b");
+		mt1.run();//执行run()方法时，调用的线程是主线程，而不是mt1线程。这时即使setname为“b”，在结果中出现的也是“main”。因为Mythread类中定义的getname是由Thread. currentThread()调用的，这个方法返回对当前正在执行的线程对象的引用。
+		
+	}
+}
+class MyThread extends Thread {
+	@Override
+    public void run() {
+        for (int i = 0; i < 100; i++) {
+			System.out.println(Thread.currentThread().getName()+":"+i);
+		}
+    }
+	
+}
+
+设置和获取线程的名称
+	设置
+		setName(String name)
+		Thread(String name)和Thread(Runnable target, String name) 
+	获取
+		getName()
+		
+		
+	新线程的默认名称：
+		Thread-n ，n从0开始编号
+	主线程的默认名称：
+		main
+
+面试题2
+继承Thread类和实现Runnable接口这两种实现多线程的方式的区别？
+	（1）继承Thread类这种方式，如果自定义的类已经继承了其他类就不能在继承Thread类
+		实现Runnable接口的方式，即使自定义的类已经继承了其他的类或者实现了其他的接口，仍然可以使用这种方式
+	（2）继承Thread类就是Thread类的子类，可以直接使用Thread类中的方法，调用比较简单
+		实现Runnable接口的方式，不能直接使用Thread类中的方法，要使用前必须先获取到当前正在运行的线程对象（Thread.currentThread()）
+
+
+Thread类
+	构造方法
+		Thread() 
+		Thread(String name) ：创建线程方式一使用，创建线程对象并设置名称，注意需要在自定义类中根据父类生成一个带参数的构造方法
+		Thread(Runnable target) 
+		Thread(Runnable target, String name) ：创建线程方式二使用，创建线程对象并设置名称
+		
+	成员方法
+		start()							:启动线程并调用run方法
+		run()							：线程执行的核心方法
+		setName(String name) 			：修改线程的名称
+		getName()						：获取线程的名称
+		static Thread currentThread() 	：获取当前正在运行的线程对象
+		static void sleep(long millis) 	:使线程休眠，时间是毫秒值，时间结束自动醒来。
+											如果在同步锁中使用sleep()方法，不会释放锁，抱着锁睡
+ 											在run()方法中使用sleep()方法，必须try...catch...处理
+因为父类的run()方法没有抛出异常，子类重写的方法绝对不能抛异常
+重写run方法的原因
+创建线程的目的是为了开启一条执行路径，使指定代码和其他代码同时运行
+运行指定代码就是该条执行路径的任务。
+jvm创建的主线程的任务都定义在了主函数中。
+自定义的线程的任务在哪呢？
+Thread类用于描述线程，线程需要任务，因此thread类中也有对自定义线程任务的描述
+这个任务通过Thread类的run方法描述。i.e.run方法就是封装自定义线程运行任务的函数
+
+开启线程是为了同步进行指定代码，那么就将继承Thread类并重写run方法，将指定代码封装在run方法内，就可以了。
+Tips之没有eclipse源码怎么看
+jdk-src.zip，里面有各个包，包里有源码
+ 多线程安全问题出现的原因
+ 	多个线程同步操作共享数据
+ 	案例：（2种方法）
+1.
+//需求:用三个线程模拟三个售票窗口,共同卖100张火车票,每个线程打印出卖第几张票
+public class TicketsDemo {
+	public static void main(String[] args) {
+		Tickets t = new Tickets();
+		Thread t1 = new Thread(t,"售票处1");
+		Thread t2 = new Thread(t,"售票处2");
+		Thread t3 = new Thread(t,"售票处3");
+		t1.start();
+		t2.start();
+		t3.start();
+	}
+}
+class Tickets implements Runnable {
+	int tickets = 100;
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		while (tickets>0) {
+			synchronized (this) {
+				if (tickets>0) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println(Thread.currentThread().getName()+":"+(tickets--));
+				}
+			}
+			
+		}
+	}
+	
+}
+2.
+public class TicketsDemo2 {
+	public static void main(String[] args) {
+		Thread t1 = new Tickets1("售票员1");
+		Thread t2 = new Tickets1("售票员2");
+		Thread t3 = new Tickets1("售票员3");
+		t1.start();
+		t2.start();
+		t3.start();
+	}
+}
+class Tickets1 extends Thread {
+	static int tickets = 100;//注意tickets要被static修饰，
+//	被static修饰的量被所有同类对象共享，不然tickets是每个对象独有的成员变量，每创建一个对象，都会有一个新的tickets
+	String s = "1";
+
+	public Tickets1() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Tickets1(String name) {
+		super(name);
+		// TODO Auto-generated constructor stub
+	}
+	public void run() {
+		while (true) {
+			synchronized (s) {
+				if (tickets>0) {
+					System.out.println(this.getName()+":"+tickets--);
+				}
+			}
+			
+		}
+	}
+}
+
+ 同步代码块
+ 	格式：
+ 		synchronized(锁对象){
+ 		
+ 		}
+ 		
+ 	位置：在方法中
+ 	
+ 	锁对象：同步代码块中的锁对象可以是任意对象，但是必须是被所有的线程所共享
+ 	
+ 同步方法
+ 	使用synchronized关键字修饰的方法，当一个方法中的所有的代码都需要被同步时，可以使用同步方法
+ 	同步方法是有锁的，有隐含的锁，只是我们看不到
+ 	
+ 	非静态的同步方法：锁是this
+ 	静态的同步方法：锁是该类的字节码对象，比如TicketThread类，它的字节码对象TicketThread.class
+package com.itheima_05;
+/*
+ * 同步方法:使用关键字synchronized修饰的方法，一旦被一个线程访问，则整个方法全部锁住，其他线程则无法访问
+ * 
+ * synchronized
+ * 注意：
+ * 		非静态同步方法的锁对象是this
+ * 		静态的同步方法的锁对象是当前类的字节码对象
+ */
+public class TicketThread implements Runnable {
+	static int tickets = 100;// 火车票数量
+	Object obj = new Object();
+
+	@Override
+	public void run() {
+		// 出售火车票
+		while (true) {
+			/*synchronized (obj) {
+				method();
+			}*/
+			
+			//method();
+			method2();
+
+		}
+	}
+
+	private synchronized void method() {
+		if (tickets > 0) {
+           
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			System.out.println(Thread.currentThread().getName() + ":" + tickets--);
+		}
+	}
+	
+	
+	private static synchronized void method2() {
+	
+		if (tickets > 0) {
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			System.out.println(Thread.currentThread().getName() + ":" + tickets--);
+		}
+	}
+
+	
+
+}
+
+
+package com.itheima_05;
+
+public class TicktetTest {
+	public static void main(String[] args) {
+		//创建线程对象
+		TicketThread tt = new TicketThread();
+		
+		Thread t = new Thread(tt);
+		t.setName("窗口1");
+		Thread t2 = new Thread(tt);
+		t2.setName("窗口2");
+		Thread t3 = new Thread(tt);
+		t3.setName("窗口3");
+		
+		//启动线程对象
+		t.start();
+		t2.start();
+		t3.start();
+	}
+}
+ 同步的类的回顾
+ 	Hashtable
+ 	Vector
+ 	StringBuffer
+ 	
+
