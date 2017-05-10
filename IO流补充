@@ -1,0 +1,514 @@
+标准输入流 & 转换流 & 打印流
+标准输入输出流
+标准输入流：System.in 返回值为InputStream，默认指向键盘，从键盘读取数据
+标准输出流：System.out 返回值为PrintStream，默认指向控制台，将数据输出到控制台
+	
+	改变指向
+		static void setOut(PrintStream out)  重新分配“标准”输出流。 
+		static void setIn(InputStream in)    重新分配“标准”输入流。
+转换流
+	OutputStreamWriter，字符流，可以将字节流转为字符流，字符流通向字节流的桥梁
+	InputStreamReader，字符流，可以将字节流转为字符流，字节流通向字符流的桥梁
+OutputStreamWriter
+由于标准输出流是一个字节输出流，所以只能输出字节或者字节数组，但是我们读取到的数据则是字符串，如果想进行输出还需要转换成字节数组
+ * 我们要想通过标准输出流输出字符串，把标准输出流转换成一种字符输出流即可，OutputStreamWriter
+
+package day10;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+
+/*利用BufferedReader,BufferedWriter
+  OutputStreamWrtier 将项目根目录下的
+  SystemInOutDemo.java 输出到控制台上
+*/
+/*改变指向
+static void setOut(PrintStream out)  重新分配“标准”输出流。 
+static void setIn(InputStream in)    重新分配“标准”输入流。
+PrintStream和InputStream對象中可以關聯一個文件路徑（創建對應的FileOutputStream和FileInputStream對象）
+*/
+public class OutputStreamWriterDemo {
+	public static void main(String[] args) throws IOException {
+//		method();
+		//創建輸入流對象
+		BufferedReader br = new BufferedReader(new FileReader("a.txt"));
+		//創建輸出流對象，輸出流對象使用標準輸入輸出流。（默認輸出到控制臺）
+		PrintStream w = System.out;
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(w));
+		//讀寫數據
+		String line;
+		while ((line=br.readLine())!=null) {
+			bw.write(line);
+			bw.newLine();
+			
+		}
+		br.close();
+		bw.close();
+		
+	}
+	
+}
+InputStreamReader
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+
+/*利用BufferedReader,BufferedWriter
+  OutputStreamWrtier 将项目根目录下的
+  SystemInOutDemo.java 输出到控制台上
+
+*/
+public class OutputStreamWriterDemo {
+	public static void main(String[] args) throws IOException {
+//改變路徑
+		System.setIn(new FileInputStream("a.txt"));
+		//創建輸入流對象，使用標準輸入流。即可以在控制臺自行輸入
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		//創建輸出流對象
+		BufferedWriter bw = new BufferedWriter(new FileWriter("d.txt"));
+		//讀寫數據
+		String line;
+		while((line = br.readLine())!=null) {
+			bw.write(line);
+			bw.newLine();
+			bw.flush();
+		}
+		bw.close();
+		br.close();
+	}
+
+}
+打印流
+	PrintStream：打印的字节流
+	PrintWriter：打印的字符流
+	
+	功能
+		write()
+		print()
+		println()
+		
+		换行
+		自动刷新（構造方法：PrintWriter(Writer out, boolean autoFlush)）
+			注意：自动刷新功能只针对 println、printf 或 format 方法有效
+代碼1：
+package day10;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class PrintWriterDemo {
+	public static void main(String[] args) throws IOException {
+		PrintWriter pw = new PrintWriter(new FileWriter("a.txt",true),true);
+		pw.println("helsd");
+		pw.println("wsefe");
+		//   pw.close();
+	}
+}
+
+代碼2：
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class PrintWriterCopyDemo {
+	public static void main(String[] args) throws IOException {
+		//創建輸入流對象
+		BufferedReader br = new BufferedReader(new FileReader("a.txt"));
+		//創建打印流對象
+		PrintWriter pw = new PrintWriter(new FileWriter("b.txt"),true);
+		
+		//讀取並寫入
+		String s ;
+		while ((s=br.readLine())!=null) {
+			pw.println(s);
+		}
+		pw.close();
+		br.close();
+	}
+}
+对象操作流
+	用来操作对象的
+	对象输出流(序列化)：ObjectOutputStream，将对象写入到文件中
+				*writeObject()
+	对象输入流（反序列化）：ObjectInputStream，将文件中的的对象读取出来
+				*readObject()
+代碼1（一個一個對象讀）
+package day10;
+
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class ObjectStreamDemo {
+	public static void main(String[] args) throws IOException, ClassNotFoundException {
+		method();
+		//創建對象輸入流對象
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream("a.txt"));
+		
+		//讀取對象
+		try{
+			while(true) {
+				Object obt = ois.readObject();
+				System.out.println(obt);
+			}
+		}catch(EOFException b) {
+			System.out.println("end");
+		}
+		//輸出
+	}
+
+	private static void method() throws IOException, FileNotFoundException {
+		//創建對象輸出流對象
+		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("a.txt"));
+		//創建對象
+		Student s1 = new Student("a",18);
+		Student s2 = new Student("b",27);
+		//輸出對象
+		oos.writeObject(s1);
+		oos.writeObject(s2);
+		//釋放資源
+		oos.close();
+	}
+}
+class Student implements Serializable{		//實現Serializable接口
+	/**
+	 * 
+	 */
+//存在一個版本號，如果不自己定義，則每次改變類的内容，默認的版本號都會變一次，會導致之前讀入的類無法寫出
+	private static final long serialVersionUID = -1370657144942482120L;
+	String name;
+	int age;
+	public Student() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Student(String name, int age) {
+		super();
+		this.name = name;
+		this.age = age;
+	}
+	@Override
+	public String toString() {
+		return "Student [name=" + name + ", age=" + age + "]";
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	
+}
+代碼2（把對象存入集合，把集合寫進文件，從文件讀出集合，遍歷集合獲得對象）
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+
+public class ObjectListDemo {
+	public static void main(String[] args) throws IOException, ClassNotFoundException{
+//		method();
+		//創建輸入流對象
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream("a.txt"));
+		
+		//讀取對象
+		ArrayList<Student> list = (ArrayList<Student>)ois.readObject();
+		//遍歷集合
+		for (Student student : list) {
+			System.out.println(student);
+		}
+		ois.close();
+	}
+
+	private static void method() throws IOException, FileNotFoundException {
+		//創建對象輸出流對象
+		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("a.txt"));
+		//創建對象
+		Student s1 = new Student("a",18);
+		Student s2 = new Student("d",33);
+		//將對象存入集合
+		ArrayList<Student> list = new ArrayList<>();
+		list.add(s1);
+		list.add(s2);
+		//輸出集合
+		oos.writeObject(list);
+		oos.close();
+	}
+}
+Properties集合
+Properties介绍
+Properties 类表示了一个持久的属性集。Properties 可保存在流中或从流中加载。属性列表中每个键及其对应值都是一个字符串。
+特点：
+1、Hashtable的子类，map集合中的方法都可以用。
+2、该集合没有泛型。键值都是字符串。
+3、它是一个可以持久化的属性集。键值可以存储到集合中，也可以存储到持久化的设备(硬盘、U盘、光盘)上。键值的来源也可以是持久化的设备。
+4、有和流技术相结合的方法。
+ 
+
+利用Properties存储键值对
+案例代码九:
+   package com.itheima_08;
+
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+/*
+ * Properties：表示了一个持久的属性集，属性列表中每个键及其对应值都是一个字符串
+ * 
+ * 构造方法：
+ * 		Properties() 
+ */
+public class PropertiesDemo2 {
+	public static void main(String[] args) {
+		//创建属性列表对象
+		Properties prop = new Properties();
+		//添加映射关系
+		prop.put("CZBK001", "zhangsan");
+		prop.put("CZBK002", "lisi");
+		prop.put("CZBK003", "wangwu");
+		
+		//遍历属性列表
+		//获取所有的key，通过key获取value
+		Set<Object> keys = prop.keySet();
+		for (Object key : keys) {
+			Object value = prop.get(key);
+			System.out.println(key + "=" + value);
+		}
+		System.out.println("------------------");
+		//获取所有的结婚证对象
+		Set<Map.Entry<Object,Object>> entrys = prop.entrySet();
+		for (Map.Entry<Object, Object> entry : entrys) {
+			Object key = entry.getKey();
+			Object value = entry.getValue();
+			System.out.println(key + "=" + value);
+		}
+	
+	}
+}
+
+Properties与流结合使用
+案例代码十:
+package com.itheima_08;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Properties;
+
+/*
+ * Properties和IO流结合的功能： 
+			void load(Reader reader) //把读到的数据存进集合
+			
+			void list(PrintWriter out)//把集合里的内容打印到文件
+			void store(Writer writer, String comments) //把集合里的内容打印到文件，与list的区别在于，store可以在文件开头加一个comments（不加，则写null）
+ 		
+ *
+ */
+public class PropertiesDemo2 {
+	public static void main(String[] args) throws IOException{
+		//method();
+		
+		//method2();
+		
+		//创建属性列表对象
+		Properties prop = new Properties();
+		//添加映射关系
+		prop.setProperty("CZBK001", "zhangsan");
+		prop.setProperty("CZBK002", "lisi");
+		prop.setProperty("CZBK003", "wangwu");
+		//创建输出流对象
+		FileWriter fw = new FileWriter("e.txt");
+		
+		//void store(Writer writer, String comments) 
+		prop.store(fw, "hello world");
+		
+		//释放资源
+		fw.close();
+		
+	
+	}
+
+	private static void method2() throws FileNotFoundException, IOException {
+		//创建属性列表对象
+		Properties prop = new Properties();
+		//创建一个输入流对象
+		FileReader fr = new FileReader("d.txt");
+		
+		//void load(Reader reader) 
+		prop.load(fr);
+		
+		//释放资源
+		fr.close();
+		
+		System.out.println(prop);
+	}
+
+	private static void method() throws FileNotFoundException {
+		//创建属性列表对象
+		Properties prop = new Properties();
+		//添加映射关系
+		prop.setProperty("CZBK001", "zhangsan");
+		prop.setProperty("CZBK002", "lisi");
+		prop.setProperty("CZBK003", "wangwu");
+		
+		//创建打印流对象
+		PrintWriter out = new PrintWriter("d.txt");
+		//void list(PrintWriter out)  
+		prop.list(out);
+		
+		//释放资源
+		out.close();
+	}
+}
+编码表
+编码表的概述
+编码表：把计算机底层的二进制数据转换成我们能看到的字符
+ * 		ASCII
+ * 
+ * 		GB2312	---	GBK
+ * 		Unicode	所有的字符都占2个字节
+ * 		UTF-8	长度可变的码表
+ * 
+ * ANSI：本地编码表	gbk
+ * Java中的字符串默认使用的ANSI（gbk）
+ * 
+ * 乱码：编码保持前后一致即可解决
+Java中字符串的编码
+常用方法
+构造方法（字节数组转字符串）：
+String():初始化一个新创建的 String 对象，使其表示一个空字符序列
+String(byte[] bytes) 使用平台的默认字符集解码指定的 byte 数组，构造一个新的 String
+String(byte[] bytes, Charset charset) 通过使用指定的 charset 解码指定的 byte 数组，构造一个新的 String
+成员方法（字符串转字节数组）
+	getBytes() 使用平台的默认字符集将此 String 编码为 byte 序列，并将结果存储到一个新的 byte 数组中
+	getBytes(Charset charset) 使用给定的 charset 将此 String 编码到 byte 序列，并将结果存储到新的 byte 数组
+
+案例代码十一
+package com.itheima_09;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+/*
+ * 编码表：把计算机底层的二进制数据转换成我们能看到的字符
+ * 		ASCII
+ * 
+ * 		GB2312	---	GBK
+ * 		Unicode	所有的字符都占2个字节
+ * 		UTF-8	长度可变的码表
+ * 
+ * ANSI：本地编码表	gbk
+ * Java中的字符串默认使用的ANSI（gbk）
+ * 
+ * 乱码：编码保持前后一致即可解决
+ * 
+ */
+public class EncoderDemo {
+	public static void main(String[] args) throws IOException   {
+		//method();
+		
+		FileInputStream fis = new FileInputStream("a.txt");
+		byte[] bys = new byte[1024];
+		int len = fis.read(bys);
+		//System.out.println(new String(bys,0,len));
+		System.out.println(new String(bys,0,len,"UTF-8"));
+	}
+
+	private static void method() throws UnsupportedEncodingException, FileNotFoundException, IOException {
+		String s = "高薪就业";
+		//byte[] bys = s.getBytes();//通过默认编码转换成数组
+		byte[] bys = s.getBytes("UTF-8");
+		
+		FileOutputStream fos = new FileOutputStream("a.txt");
+		fos.write(bys);
+		fos.close();
+	}
+
+}
+
+
+
+字符流中的编码
+常见对象
+InputStreamReader(InputStream in, CharsetDecoder dec) 创建使用给定字符集解码器的 InputStreamReader
+
+OutputStreamWriter(OutputStream out, CharsetEncoder enc) 创建使用给定字符集编码器的 OutputStreamWriter
+案例代码十二
+package com.itheima_09;
+
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+
+/*
+ * 字符流中的编码
+ * 
+ * 字符流 = 字节流 + 编码
+ * 
+ */
+public class EncoderDemo2 {
+	public static void main(String[] args) throws IOException {
+		//method();
+		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("b.txt"),"UTF-8");
+		//OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("b.txt"));
+		String s = "迎娶白富美";
+		osw.write(s);
+		
+		osw.close();
+		
+	}
+
+	private static void method() throws IOException, UnsupportedEncodingException {
+		FileWriter fw = new FileWriter("b.txt");
+		
+		String s = "月薪过万";
+		byte[] bys = s.getBytes("UTF-8");
+		
+		//fw.write(s);
+		fw.write(new String(bys));
+		fw.close();
+	}
+ 
+}
+
+
+
+
+
