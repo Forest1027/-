@@ -1,0 +1,224 @@
+Day 12  2017/5/11
+网络编程
+两个设备上的程序进行交互
+网络通信三要素
+IP地址：每个设备在网络中的唯一标识
+  点分十进制表示法
+端口号：每个设备上的程序的唯一标识。进程地址
+0-65535，一般0-1024留给系统
+协议：数据交互的规则、规范
+UDP：对数据进行打包、封装。大小限制在64k。不区分客户端和服务端，而是叫做发送端和接收端。面向无连接。速度快、不可靠
+TCP：区分客户端和服务端。有连接，三次握手完成连接。速度慢、可靠
+InetAddress类
+Java中用来表示IP地址的类，位于net包下
+static InetAddress
+getByName(String host) 
+          在给定主机名的情况下确定主机的 IP 地址。
+ 
+static InetAddress
+getLocalHost() 
+          返回本地主机。
+ 
+UDP协议
+UDP是无连接通信协议，即在数据传输时，数据的发送端和接收端不建立逻辑连接。简单来说，当一台计算机向另外一台计算机发送数据时，发送端不会确认接收端是否存在，就会发出数据，同样接收端在收到数据时，也不会向发送端反馈是否收到数据。
+由于使用UDP协议消耗资源小，通信效率高，所以通常都会用于音频、视频和普通数据的传输例如视频会议都使用UDP协议，因为这种情况即使偶尔丢失一两个数据包，也不会对接收结果产生太大影响。
+但是在使用UDP协议传送数据时，由于UDP的面向无连接性，不能保证数据的完整性，因此在传输重要数据时不建议使用UDP协议。UDP的交换过程如下图所示。
+ 
+DatagramPacket
+前面介绍了UDP是一种面向无连接的协议，因此，在通信时发送端和接收端不用建立连接。UDP通信的过程就像是货运公司在两个码头间发送货物一样。在码头发送和接收货物时都需要使用集装箱来装载货物，UDP通信也是一样，发送和接收的数据也需要使用“集装箱”进行打包，为此JDK中提供了一个DatagramPacket类，该类的实例对象就相当于一个集装箱，用于封装UDP通信中发送或者接收的数据。
+想要创建一个DatagramPacket对象，首先需要了解一下它的构造方法。在创建发送端和接收端的DatagramPacket对象时，使用的构造方法有所不同，接收端的构造方法只需要接收一个字节数组来存放接收到的数据，而发送端的构造方法不但要接收存放了发送数据的字节数组，还需要指定发送端IP地址和端口号。
+接下来根据API文档的内容，对DatagramPacket的构造方法进行逐一详细地讲解。
+	 
+使用该构造方法在创建DatagramPacket对象时，指定了封装数据的字节数组和数据的大小，没有指定IP地址和端口号。很明显，这样的对象只能用于接收端，不能用于发送端。因为发送端一定要明确指出数据的目的地(ip地址和端口号)，而接收端不需要明确知道数据的来源，只需要接收到数据即可。
+ 
+使用该构造方法在创建DatagramPacket对象时，不仅指定了封装数据的字节数组和数据的大小，还指定了数据包的目标IP地址（addr）和端口号（port）。该对象通常用于发送端，因为在发送数据时必须指定接收端的IP地址和端口号，就好像发送货物的集装箱上面必须标明接收人的地址一样。
+上面我们讲解了DatagramPacket的构造方法，接下来对DatagramPacket类中的常用方法进行详细地讲解，如下表所示。
+ 
+DatagramSocket
+DatagramPacket数据包的作用就如同是“集装箱”，可以将发送端或者接收端的数据封装起来。然而运输货物只有“集装箱”是不够的，还需要有码头。在程序中需要实现通信只有DatagramPacket数据包也同样不行，为此JDK中提供的一个DatagramSocket类。DatagramSocket类的作用就类似于码头，使用这个类的实例对象就可以发送和接收DatagramPacket数据包，发送数据的过程如下图所示。
+ 
+在创建发送端和接收端的DatagramSocket对象时，使用的构造方法也有所不同，下面对DatagramSocket类中常用的构造方法进行讲解。
+ 
+该构造方法用于创建发送端的DatagramSocket对象，在创建DatagramSocket对象时，并没有指定端口号，此时，系统会分配一个没有被其它网络程序所使用的端口号。
+ 
+该构造方法既可用于创建接收端的DatagramSocket对象，又可以创建发送端的DatagramSocket对象，在创建接收端的DatagramSocket对象时，必须要指定一个端口号，这样就可以监听指定的端口。
+上面我们讲解了DatagramSocket的构造方法，接下来对DatagramSocket类中的常用方法进行详细地讲解。
+ 
+UDP实现
+使用UDP协议发送数据：
+创建发送端Socket对象
+创建数据并打包
+发送数据
+释放资源
+ 
+相关类：
+1.DatagramSocket：发送和接收数据，基于UDP协议
+ 
+DatagramSocket() 
+          构造数据报套接字并将其绑定到本地主机上任何可用的端口。
+ 
+DatagramSocket(int port) 
+          创建数据报套接字并将其绑定到本地主机上的指定端口。
+ 
+2.DatagramPacket：此类表示数据报包
+ 
+使用UDP协议接收数据：
+创建接收端Socket对象
+接收数据
+解析数据
+输出数据
+代码示例
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.Scanner;
+
+public class UDPDemo {
+	public static void main(String[] args) throws IOException {
+		//创建Socket对象
+		DatagramSocket ds = new DatagramSocket();
+
+		Scanner sc = new Scanner(System.in);
+		System.out.println("请输入想传输的内容");
+		
+		while (true) {
+			
+			//创建数据并打包
+			String s = sc.nextLine();
+			if (s.equals("quit")) {
+				break;
+			}
+			byte[] bys = s.getBytes();
+			int len = bys.length;
+			InetAddress address = InetAddress.getByName("DESKTOP-IGJR5L5");
+			int port = 1027;
+			DatagramPacket dp = new DatagramPacket(bys, len, address , port);
+			
+			//发送数据
+			ds.send(dp);
+		}
+		
+		
+		//释放资源
+		ds.close();
+	}
+}
+
+使用UDP协议收发数据的注意事项
+•	端口号错误，数据可以正常发出，不会出现异常，只是收不到而已。
+•	端口号不可以重复
+TCP协议
+TCP通信同UDP通信一样，都能实现两台计算机之间的通信，通信的两端都需要创建socket对象。
+区别在于，UDP中只有发送端和接收端，不区分客户端与服务器端，计算机之间可以任意地发送数据。
+而TCP通信是严格区分客户端与服务器端的，在通信时，必须先由客户端去连接服务器端才能实现通信，服务器端不可以主动连接客户端，并且服务器端程序需要事先启动，等待客户端的连接。
+在JDK中提供了两个类用于实现TCP程序，一个是ServerSocket类，用于表示服务器端，一个是Socket类，用于表示客户端。
+通信时，首先创建代表服务器端的ServerSocket对象，该对象相当于开启一个服务，并等待客户端的连接，然后创建代表客户端的Socket对象向服务器端发出连接请求，服务器端响应请求，两者建立连接开始通信。
+ServerSocket
+通过前面的学习知道，在开发TCP程序时，首先需要创建服务器端程序。JDK的java.net包中提供了一个ServerSocket类，该类的实例对象可以实现一个服务器段的程序。通过查阅API文档可知，ServerSocket类提供了多种构造方法，接下来就对ServerSocket的构造方法进行逐一地讲解。
+ 
+使用该构造方法在创建ServerSocket对象时，就可以将其绑定到一个指定的端口号上（参数port就是端口号）。
+接下来学习一下ServerSocket的常用方法，如表所示。
+ 
+ServerSocket对象负责监听某台计算机的某个端口号，在创建ServerSocket对象后，需要继续调用该对象的accept()方法，接收来自客户端的请求。当执行了accept()方法之后，服务器端程序会发生阻塞，直到客户端发出连接请求，accept()方法才会返回一个Scoket对象用于和客户端实现通信，程序才能继续向下执行。
+Socket
+讲解了ServerSocket对象可以实现服务端程序，但只实现服务器端程序还不能完成通信，此时还需要一个客户端程序与之交互，为此JDK提供了一个Socket类，用于实现TCP客户端程序。
+通过查阅API文档可知Socket类同样提供了多种构造方法，接下来就对Socket的常用构造方法进行详细讲解。
+ 
+使用该构造方法在创建Socket对象时，会根据参数去连接在指定地址和端口上运行的服务器程序，其中参数host接收的是一个字符串类型的IP地址。
+ 
+该方法在使用上与第二个构造方法类似，参数address用于接收一个InetAddress类型的对象，该对象用于封装一个IP地址。
+在以上Socket的构造方法中，最常用的是第一个构造方法。
+接下来学习一下Socket的常用方法，如表所示。
+方法声明	功能描述
+int getPort()	该方法返回一个int类型对象，该对象是Socket对象与服务器端连接的端口号
+InetAddress getLocalAddress()	该方法用于获取Socket对象绑定的本地IP地址，并将IP地址封装成InetAddress类型的对象返回
+void close()	该方法用于关闭Socket连接，结束本次通信。在关闭socket之前，应将与socket相关的所有的输入/输出流全部关闭，这是因为一个良好的程序应该在执行完毕时释放所有的资源
+InputStream getInputStream()	该方法返回一个InputStream类型的输入流对象，如果该对象是由服务器端的Socket返回，就用于读取客户端发送的数据，反之，用于读取服务器端发送的数据
+OutputStream getOutputStream()	该方法返回一个OutputStream类型的输出流对象，如果该对象是由服务器端的Socket返回，就用于向客户端发送数据，反之，用于向服务器端发送数据
+在Socket类的常用方法中，getInputStream()和getOutStream()方法分别用于获取输入流和输出流。当客户端和服务端建立连接后，数据是以IO流的形式进行交互的，从而实现通信。
+接下来通过一张图来描述服务器端和客户端的数据传输，如下图所示。
+ 
+
+
+TCP实现
+发送数据（客户端）：
+创建发送端Socket对象（创建连接）
+获取输出流对象
+发送数据
+释放资源
+代码
+package day12;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+
+public class TCPDemo {
+	public static void main(String[] args) throws IOException, IOException {
+//		创建发送端Socket对象（创建连接）
+		Socket s = new Socket(InetAddress.getLocalHost(),10086);
+//		获取输出流对象
+		OutputStream os = s.getOutputStream();
+		String str = "abskfg";
+//		发送数据
+		os.write(str.getBytes());
+//		释放资源
+		s.close();
+	}
+}
+接收数据（服务端）：
+创建Socket对象（明确端口号）
+监听（阻塞），等待客户端连接
+获取输入流对象
+获取数据
+输出数据
+释放资源
+ 代码：
+	} package day12;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class TCPDemo2 {
+	public static void main(String[] args) throws IOException {
+//		创建Socket对象（明确端口号）
+		ServerSocket ss = new ServerSocket(10086);
+//		监听（阻塞），等待客户端连接
+		Socket s = ss.accept();
+//		获取输入流对象
+		InputStream is = s.getInputStream();
+//		获取数据
+		byte[] bys = new byte[1024];
+		int len = is.read(bys);
+		InetAddress ia = s.getInetAddress();
+//		输出数据
+		System.out.println(ia.getHostAddress()+":"+new String(bys,0,len));
+//		释放资源
+		s.close();
+//		服务器一般不关
+	}
+}
+
+案例1：
+需求：使用TCP协议发送数据，并将接收到的数据转换成大写返回
+         客户端发出数据
+         服务端接收数据
+         服务端转换数据
+         服务端发出数据
+         客户端接收数据
+ 
+案例2：
+模拟用户登陆
+创建客户端Socket对象
+获取用户名和密码
+获取输出流对象
+写出数据
+ 
+获取输入流对象
+获取服务器返回的数据
+释放资源
