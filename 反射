@@ -1,0 +1,257 @@
+反射
+	什么是反射？
+		在运行时期，可以获取和调用类的所有的构造方法、成员变量和成员方法
+		
+		反射是Java中解剖学，可以对类进行解剖，首先要获取类的字节码对象，然后获取其中的构造方法、成员变量和成员方法
+		
+	如何获取字节码对象
+		方式一：
+			对象.getClass();
+			举例：
+			Student s = new Student();
+			Class clazz = s.getClass();
+		方式二：
+			类名.class
+			举例：
+				Class clazz = Student.class;
+		方式三：
+			Class.forName(全类名);
+			举例：
+				String className = "com.itheima.javabean.Person";
+				Class clazz = Class.forName(className);
+代码：
+ 
+		课堂练习：
+			步骤：
+				1、创建Student类
+					成员变量
+						String name
+						int age
+					
+					构造方法
+						空参
+						有参
+					
+					getters&setters方法	
+					
+				2、测试类
+					通过三种方式获取Student类的字节码对象
+					
+Class类
+	Constructor<T> getConstructor(Class<?>... parameterTypes)  ：获取指定参数的public修饰的构造方法，如果不传递参数就是获取空参构造
+	Constructor<?>[] getConstructors()  ：获取所有的public修饰的构造方法
+	T newInstance()  ：通过空参构造创建对象
+	
+	Field getField(String name)  ：获取指定的public修饰的成员变量
+	Field[] getFields()  ：获取所有的public修饰的成员变量
+	Field getDeclaredField(String name)  ：获取指定的成员变量，包括私有的
+	Field[] getDeclaredFields()  ：获取所有的成员变量，包括私有的
+	
+	Method getMethod(String name, Class<?>... parameterTypes) ：获取指定的public的成员方法，第一个参数是方法名，方法参数类型的字节码对象
+	Method[] getMethods()  ：获取所有的public修饰的成员方法
+	Method getDeclaredMethod(String name, Class<?>... parameterTypes) ：获取指定的成员方法，包括私有的，当方法没有参数列表时，第二参数可以不传递
+	Method[] getDeclaredMethods()  ：获取所有的成员方法，包括私有的
+	
+构造方法
+	Class类
+		Constructor<T> getConstructor(Class<?>... parameterTypes)  ：获取指定参数的public修饰的构造方法，如果不传递参数就是获取空参构造
+		Constructor<?>[] getConstructors()  ：获取所有的public修饰的构造方法
+		T newInstance()  ：通过空参构造创建对象
+	
+	Constructor类
+		T newInstance(Object... initargs) ：传入指定参数调用指定的构造方法创建对象，如果不传递参数，表示调用的是空参构造
+
+	获取构造方法的步骤
+		查看Class类中的方法
+		
+	创建对象
+		通过空参创建
+			Class字节码对象->Class类中的getConstructor()->Constructor类中的newInstance()
+			举例：
+				Class clazz = Class.forName("com.itheima_01.Student");
+				//获取无参构造
+				Constructor c = clazz.getConstructor();
+				Object obj = c.newInstance();
+			
+			Class字节码对象->Class类中的newInstance()
+			举例：
+				Class clazz = Class.forName("com.itheima_01.Student");
+				Object obj = clazz.newInstance();
+			
+		通过有参创建
+			Class字节码对象->Class类中的getConstructor(参数类型.class)->Constructor类中的newInstance(实参)
+			举例：
+				Class clazz = Class.forName("com.itheima_01.Student");
+				//获取有参构造，参数1类型为String，参数2类型为int
+				Constructor c = clazz.getConstructor(String.class,int.class);
+				Object obj = c.newInstance("lisi",30);
+代码：
+ 
+成员变量
+	Class类
+		Field getField(String name)  ：获取指定的public修饰的成员变量
+		Field[] getFields()  ：获取所有的public修饰的成员变量
+		Field getDeclaredField(String name)  ：获取指定的成员变量，包括私有的
+		Field[] getDeclaredFields()  ：获取所有的成员变量，包括私有的
+
+	Field类
+		Object get(Object obj)  ：获取指定对象obj的指定的成员变量的值，参数传递的是对象
+		void set(Object obj, Object value)  ：修改指定对象obj的指定成员变量的值为value，第一参数传递的是对象，第二参数是新值
+		void setAccessible(boolean flag):设置可以访问，暴力访问（该方法继承自父类），如果是私有的成员变量，需要首先调用该方法取消访问权限
+		
+	获取成员变量的Field类型
+		查看Class类中的方法
+		
+	获取成员变量的值
+		
+	修改成员变量的值
+		
+	获取并访问成员变量的步骤
+		（1）获取字节码对象（Class对象）
+		（2）通过Class类中的newInstance()方法创建对象
+		（3）通过Class类中的getField(String name)方法，获取指定成员变量的Field类型对象
+		（4）通过Field类中get或者set方法来获取指定成员变量的值，或者设置成员变量的值
+	代码：
+ 
+	获取并访问私有的成员变量的步骤
+		（1）获取字节码对象（Class对象）
+		（2）通过Class类中的newInstance()方法创建对象
+		（3）通过Class类中的getDeclaredField(String name)方法，获取指定成员变量的Field类型对象
+		（4）通过Field类中的setAccessible(boolean flag)，传递true值，设置可以访问
+		（5）通过Field类中get或者set方法来获取指定成员变量的值，或者设置成员变量的值
+	代码
+ 	
+		举例：
+			//获取学生类的字节码对象
+			Class clazz = Class.forName("com.itheima_01.Student");
+			//获取学生对象
+			Object stu = clazz.newInstance();
+			//获取私有的字段对象
+			Field f = clazz.getDeclaredField("name");
+			f.setAccessible(true);//设置反射时取消Java的访问检查,暴力访问
+			
+			//操作：设置和获取
+			// 设置（修改）
+			f.set(stu, "lisi");
+			// 获取
+			Object name = f.get(stu);
+			
+			System.out.println(name);
+
+成员方法
+	Class类
+		Method getMethod(String name, Class<?>... parameterTypes) ：获取指定的public的成员方法，第一个参数是方法名，方法参数类型的字节码对象
+ 		Method[] getMethods()  ：获取所有的public修饰的成员方法
+ 		Method getDeclaredMethod(String name, Class<?>... parameterTypes) ：获取指定的成员方法，包括私有的，当方法没有参数列表时，第二参数可以不传递
+ 		Method[] getDeclaredMethods()  ：获取所有的成员方法，包括私有的
+ 	Method类
+ 		Object invoke(Object obj, Object... args)  ：用于执行方法，第一个参数是对象，第二个参数传递的是实参，该方法有返回值，该返回值就是被执行的方法的返回值
+ 		
+ 		
+ 	获取方法并调用
+ 		步骤：
+ 			（1）	获取字节码对象（Class对象）
+			（2）通过Class类中的newInstance()方法创建对象
+			（3）通过Class类中的getMethod()获取指定的方法的Method类型对象
+			（4）通过调用Method类中的invoke()方法执行方法
+	代码
+ 
+课堂案例
+		1、已知一个类，定义如下： 
+			package com.itheima; 
+			public class DemoClass { 
+				public void run() { 
+					System.out.println("welcome to heima!"); 
+				} 
+			} 
+		(1)写一个Properties格式的配置文件，配置类的完整名称。
+		(2)写一个程序，读取这个Properties配置文件，获得类的完整名称并加载这个类，
+		(3)用反射 的方式运行run方法。
+	 
+		
+		2.ArrayList<Integer> list = new ArrayList<Integer>(); 
+		这个泛型为Integer的ArrayList中存放一个String类型的对象
+	 
+JavaBean的概述和规范
+JavaBean的概述:
+	将需要操作的多个属性封装成JavaBean, 简单来说就是用于封装数据的
+规范：
+类使用公共进行修饰
+提供私有修饰的成员变量
+为成员变量提供公共getter和setter方法
+提供公共无参的构造
+BeanUtils工具类
+ 	BeanUtils常用方法
+ * 			static void	setProperty(Object bean, String name, Object value) ：
+ 			给成员变量赋值，第一个参数表示JavaBean对象，第二个参数表示成员变量的名称，第三个参数设置的值
+ * 			static String getProperty(Object bean, String name) ：
+ 			获取成员变量的值，第一个参数表示JavaBean对象，第二个参数表示成员变量的名称
+ * 			static void	populate(Object bean, Map properties) ：
+ 			设置值，第一个参数表示JavaBean对象，第二个参数是一个Map集合，封装了成员变量及其对应的值
+ 
+自定义BeanUtils
+ 
+
+
+
+
+可变参数
+	/**
+	 * 可变参数
+	 * 		JDK1.5的新特性（自动拆装箱、泛型、增强for、枚举）
+	 * 
+	 * 		格式：
+	 * 			数据类型... 参数名
+	 * 
+	 * 		位置：
+	 * 			方法小括号中，当作形式参数
+	 * 
+	 * 		特点：
+	 * 			1、本质上是一个数组
+	 * 			2、可以传递0~无穷多个值
+	 * 			3、当方法的参数列表有多个，并且包含可变参数时，可变参数必须位于最后一个参数，
+	 * 				一个方法参数列表中，可变参数只能有一个
+	 * 			  The variable argument type int of the method findIndex must be the last parameter
+	 * 
+	 * @author huangyun
+	 *
+	 */
+	public class ChangeableArgs {
+	
+		public static void main(String[] args) {
+	//		int... arr;
+			
+			int[] arr = {3,1,4,10,5};
+			
+			// 打印数组中的元素
+	//		printArr(arr);
+			
+	//		printArr(1,2);
+			
+	//		int index = findIndex(arr,4);
+			int index = findIndex(4, arr);
+			System.out.println("索引："+index);
+		}
+	
+		/*public static void printArr(int[] arr) {
+			for (int i : arr) {
+				System.out.println(i);
+			}
+		}*/
+		
+		public static int findIndex(int i, int... arr) {
+			for (int j = 0; j < arr.length; j++) {
+				if (i==arr[j]) {
+					return j;
+				}
+			}
+			return -1;
+		}
+		
+		public static void printArr(int... arr){
+			for (int i : arr) {
+				System.out.println(i);
+			}
+		}
+	}
+	
