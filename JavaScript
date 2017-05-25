@@ -1,0 +1,194 @@
+HTML：用来写网页
+CSS：美化页面
+JavaScript：前端的大脑和灵魂。是一种脚本语言
+脚本语言：无法独立执行。必须嵌套到其他语言中，结合使用。
+
+JS的语言特征和注意事项
+特征：
+无需编译，直接被浏览器解释并执行
+无法独立运行
+从上到下运行
+
+注意事项：
+JS无法访问系统文件（安全）
+无需编译，由上到下依次执行。因此保证可读性的情况下，可以链式编程。
+JS与Java无关
+
+JS的组成
+ECMAScript（核心）：规定了JS的语法和基本对象
+DOM 文档（标记型文档）对象模型：处理网页内容的方法和接口
+BOM 浏览器对象模型：与浏览器交互的方法和接口
+
+外部脚码引入
+规范化的放置位置：
+script标签的放置方式为body的结束标签前
+
+基础语法
+注释
+单行注释/多行注释
+
+变量
+Var 变量名，默认值为undefined
+JS中没有单个字符
+基本数据类型（原始类型 5个）
+	String boolean undefined number object
+	undefined是从null派生出来的
+	typeof(null)==object（ECMAScript创立初的bug ）
+引用数据类型
+	对象
+运算符
+	=== 全等（值和类型）
+	逻辑运算符
+	&& || ！
+正则对象
+	直接量方式：/*正则表达式$/
+	普通方式：/正则表达式/
+		除非全部字符都不符合正则，返回false。只要有一个字符符合，就返回true
+
+全局函数（Global）
+eval(string) （执行函数）可以把传入的字符串作为JS代码执行
+eval("var x = 10")
+作用：可以拓展程序功能
+注意事项：只能传递基本数据类型的字符串，不能传入字符串对象
+
+编码/解码
+URL编码：对中文及特殊符号进行编码。%16进制。保证数据传递的完整性
+encodeURI（string）
+decodeURI(string)
+URI&URL
+URI:统一 资源标识符。包含资源名
+URL：统一资源定位器。包含http://
+浏览器可以访问到的——资源
+
+字符串转数字
+parseInt() 字面值转为整数，小数部分不关注
+parseFloat() 
+NaN——Not a Number 数字类型的标识，专门标识当前的值不是数字
+
+自定义函数
+格式1
+function 方法名(变量名) {
+	Return a+b;
+}
+格式2（匿名函数）
+Var calculate = function(a,b){ return a>b? a:b;}
+Calculate(2,5);
+
+1.小写function
+2.无需定义返回值类型
+3.参数无需定义var
+
+注意事项：
+1.JS一定有返回值。没有return就返回undefined 
+2.不存在方法重载，只有方法的覆盖
+3.如果形参未赋值，就使用默认值undefined
+
+自定义对象
+function 对象名(){
+
+}
+为属性赋值
+1.构造参数赋值
+2.创建对象后调用属性
+
+属性的定义方式
+一、
+1.this关键字（指代当前对象），定义一个属性
+2.创建对象后，使用对象.属性方式，动态定义属性
+二、
+对象直接量
+var  person = {name:"小李",age:18};
+快捷创建自定义对象
+
+辨析JS函数和对象
+函数的特点：
+	函数里面一般是处理业务逻辑
+	函数可能有return返回值
+对象的特点：
+	有this关键字给属性赋值
+	
+
+BOM对象 
+	Browser Object Model 浏览器对象模型
+	作用：执行浏览器的相关操作。
+	window代表BOM对象
+	警告框：alert()
+	确认框：confirm()
+		确定：true
+		取消：false
+	
+	定时器  setInterval（调用方法，毫秒值）
+	//毫秒值：循环周期
+		取消循环定时器
+		clearInterval（循环定时器的id ）
+	一次性定时器的设置与取消
+	setTImeout（）
+	clearTimeout（）
+	
+	
+	Location对象
+	获取、设置当前地址
+
+DOM对象（Document Object Model）
+	DOM树
+	特点：
+		必然有一个根节点
+		常见节点关系：父子节点关系
+		每个节点（除叶子和根节点）都有父亲，一到多个孩子
+		没孩子：叶子节点
+		没父亲：根节点
+		
+	获取元素节点对象的四种方法
+		getElementById() 通过ID获取对应的元素对象
+		getElementsByName() 通过name属性获取符合要求的所有元素
+		getElementsByTagName() 通过元素的元素名属性获取符合要求的所有元素
+		getElementsByClassName()
+		
+	元素对象常见属性
+	Value
+		元素对象.value，获取属性值
+	Classname
+		
+	Checked 修改单选/复选的选中与否
+		True/false
+	innerHTML 操作元素内容体
+		修改
+		追加 
+	
+
+JS事件   
+onclick="run()"
+通过事件可以完成简单特效
+驱动机制：
+	事件源——按钮
+	事件——onclick
+	监听器——run()
+	注册/绑定监听器onclick="run()"
+焦点事件：整个页面的注意力
+	获取焦点事件（onfocus）
+	失去焦点事件（onblur）
+域内容改变事件（onchange）
+	元素组件的值发生改变时触发
+加载完毕事件（onload）
+	元素组件加载完毕即触发
+表单提交事件（onsubmit）（重点）
+	表单的提交按钮被点击时被触发
+	用于表单的校验
+键位弹起事件（onkeyup）
+	用于信息的校验
+常见的鼠标事件
+	鼠标移入事件（onmouseover）
+	鼠标移出事件（onmouseoff）
+	
+JS事件的绑定方式
+	事件句柄绑定方式
+	绑定一个无参函数/绑定有参函数/对象/多个函数
+	优缺点 
+	Js与HTML高度糅合，不宜多部门开发
+	开发便捷、传参方便。绑定多个函数
+	
+	DOM绑定方式
+	对象.事件属性
+	Window.onload=run1;
+	Window.onload=function(){run1()};
+	使HTML和JS分离
