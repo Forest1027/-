@@ -1,0 +1,109 @@
+XML概述
+	可扩展的标记语言（eXtendible Markup Language）。用于描述（存储和传输）数据而非显示数据。自定义标签。类似HTML，不同的是，HTML的标签是写定的，而且它是用来显示数据的
+	由W3C组织发布
+XML的文档声明
+	XML文档的组成
+	-文档声明
+		必须在文档的第一行
+	-元素
+		包含标签体：开始标签和结束标签的标签名一样，成对出现
+		不包含标签体：
+		规范：区分大小写；只能以字母或下划线开头；名称字符之间不能有冒号、空格、制表符；
+		特点：
+			1.元素一般成对出现:<note></note>
+			如果没有成对出现，则要写成空标签的形式:<note/>
+			2.元素可以嵌套元素，元素中也可以编写文本，在元素上还能添加属性
+			<note title="warning">
+				<from>zhangsan</from>
+			</note>
+			3.一个格式良好的xml文档，只能有一个根标签
+	-元素的属性
+	-注释
+		被注释的内容无法被解析到。
+		只能够下载文档声明 的下面
+		不能嵌套注释
+	-CDATA区
+		Character Data
+		作用：把标签当作普通文本内容
+		格式：<![CDATA[
+				<itheima>www.itheima.com</itheima>
+			]]>
+	-特殊字符
+		特殊符号的替代品（转义）
+		
+	-处理指令（Processing Instructor）
+		用于指导软件如何解析XML文档
+		语法：<?...?>
+XML的约束
+	分类：
+		DTD约束：Document Type Definition
+			定义属性
+		Schema约束：
+XML解析
+解析方式：
+DOM方式
+	将整棵树一口气全部加载到内存中。我们可以特别方便的操作任何标签、属性，但当整棵树特别大的时候，会出现内存溢出的问题。
+SAX方式
+	一个一个节点进行解析。标签、属性、文本、甚至换行都称为节点。
+XML解析开发包
+JAXP：Sun公司提供
+Dom4J（Dom for Java）：开源组织提供的
+	常用方法
+	Document，Element getElement()获取元素对象（根标签）
+	Element，List elements()获取所有的子元素
+			List elements(String name)根据指定的元素来获取相应的子元素
+			Element element(String name)根据指定的元素名称来获取子元素对象
+			String elementText(String name)根据指定的元素名称，来获取子元素中的文本
+			String getText()获取当前元素对象的文本-
+	Dom4J的常用方法：
+	 * 	Document
+	 * 		Element getRootElement() :获取根元素对象（根标签）
+	 Element	getRootElement() 
+		          Returns the root Elementfor this document.
+	
+	 * 	Element
+	 * 		List elements() ：获取所有的子元素
+	 List	elements() 
+		           Returns the elements contained in this element.
+	
+	 * 		List elements(String name)：根据指定的元素名称来获取相应的所有的子元素
+	 List	elements(String name) 
+		           Returns the elements contained in this element with the given local name and any namespace.
+	
+	 * 		Element element(String name)：根据指定的元素名称来获取子元素对象,如果元素名称重复，则获取第一个元素 
+	 Element	element(String name) 
+		          Returns the first element for the given local name and any namespace.
+	
+	 * 		String	elementText(String name) ：根据指定的子元素名称，来获取子元素中的文本
+	 String	elementText(String name) 
+		           
+	
+	 * 		String	getText() ：获取当前元素对象的文本
+	String	getText() 
+		          Returns the text value of this element without recursing through child elements.
+	
+	 * 		void setText(String text)：设置当前元素对象的文本（從node繼承）
+	setText
+	public void setText(String text)
+	Sets the text data of this node or this method will throw anUnsupportedOperationException if it is read-only.
+	Parameters:
+	text - is the new textual value of this node
+	
+	 * 		String	attributeValue(String name)：根据指定的属性名称获取其对应的值
+	 String	attributeValue(String name) 
+		           This returns the attribute value for the attribute with the given name and any namespace or null if there is no such attribute or the empty string if the attribute value is empty.
+	
+	 * 		public Element addAttribute(String name,String value)：根据指定的属性名称和值进行添加或者修改
+	 Element	addAttribute(String name, String value) 
+		           Adds the attribute value of the given local name.
+	
+	 * 		addElement
+	 Element	addElement(String name) 
+		          Adds a new Element node with the given name to this branch and returns a reference to the new node.
+	
+	 * 	DocumentHelper
+	 * 		static Element
+					createElement(String name) 
+	static Element	createElement(String name) 
+		           
+	
