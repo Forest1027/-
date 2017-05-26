@@ -1,0 +1,98 @@
+重置MySQL的密码
+	步骤：
+	1.停止MySQL的服务
+	Services.msc
+	2.在命令行中启动MySQL服务（无需权限认证）
+	Mysqld --skip-grant-tables
+	3.重新开启cmd的命令行
+		登录mysql不用输入密码
+	4.修改root的密码
+		Use mysql;
+		Update user set password =  password('abc') where user = 'root';
+	5.结束mysqld的进程
+	6.重新启动mysql
+
+数据库的备份与还原
+	数据库的备份
+		1.在cmd命令行窗口(管理员命令行)
+		Mysqldump -u root -p web_test1>c:/web_test1.sql
+	数据库的还原
+		还原方式一
+		1.在数据库服务器的内部创建数据库
+		Create database xxx
+		2.在命令行窗口执行
+		mysql -u root -p  web_test1<c:/web_test1.sql
+		
+		还原方式二
+		1.在数据库服务器的内部创建数据库
+		2.切换到该数据库，使用source命令还原
+可视化工具-SQLyog
+多表设计之外键约束
+	用来保证多表之间数据的完整性 
+	添加外键约束
+
+多表设计之一对多关系
+多表设计之多对多关系
+多表设计之一对一关系
+
+多表查询
+	分类
+	连接查询
+		交叉连接：cross join
+			查询到的是两个表的笛卡尔积
+			Select *from 表1 cross join 表2；
+			Select *from 表1，表2；
+		内连接：inner join
+			显式内连接：在SQL中显示的调用inner join关键字
+			Select *from 表1 inner join 表2 on 关联条件；
+			隐式内连接
+			Select * from 表1，表2 where 关联条件；
+		外连接：outer join（outer 可以省略）
+			左外连接
+			Select *from 表1 left outer join 表2 on 关联条件；
+			右外连接
+			Select * from 表1 right outer join 表2 on 关联条件；
+	内连接与外连接的区别
+		
+	
+	子查询
+		一个查询语句条件需要依赖另一个语句查询的结果
+		带in的子查询
+			在给定的结果内查询
+		带exists的子查询
+			exists后面查询结果存在，前面sql语句才执行
+		带any的子查询
+			只要符合any后面查询语句中的任何一个结果就行
+		带all的子查询
+
+事务
+	逻辑上的一组操作，组成这组操作的各个逻辑单元，要么全都成功，要么全都失败。
+	开启事务
+		start 
+	提交事务
+		commit
+	回滚事务
+		rollback
+	事务的特性
+	1.原子性
+		不可分割
+	2.一致性
+		事务执行的前后，数据完整性保持一致
+	3.隔离性
+		事务执行不应该受到其他事务的干扰
+	4.持久性
+		事务一旦结束，数据就持久化到数据库中
+事物的隔离级别
+	如果不考虑事物的隔离性（一个事务的执行受到其他事务的干扰），那么就会引发一些安全问题，主要体现在读取数据上。
+	1.脏读：一个事务读到了另一个事务未提交的数据，导致查询结果不一致。
+	2.不可重复读：一个事务读到了另一个事务已经update的数据
+	3.虚读/幻读：一个事务读到了另一个事务已经提交的insert的数据，导致多次查询结果不一致。
+	
+	
+	解决这些安全性问题
+	设置事务的隔离级别
+	1.read uncommitted：脏读、不可重复读，虚读，都有可能发生。
+	2.read committed：避免脏读，但不可重复读和虚读是有可能发生
+	3.repeatable read：避免脏读和不可重复读
+	4.serializable：避免脏读、不可重复读、虚读。但效率低
+
